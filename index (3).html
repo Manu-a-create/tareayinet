@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Calculadora</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculadora {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .titulo {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .pantalla {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            text-align: right;
+            word-wrap: break-word;
+            border: 2px solid #e0e0e0;
+        }
+
+        .operacion {
+            color: #888;
+            font-size: 14px;
+            min-height: 20px;
+            margin-bottom: 5px;
+        }
+
+        .resultado {
+            color: #333;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .botones {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .numero {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .operador {
+            background: #667eea;
+            color: white;
+        }
+
+        .funcion {
+            background: #ff6b6b;
+            color: white;
+            font-size: 16px;
+        }
+
+        .igual {
+            background: #51cf66;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .limpiar {
+            background: #ff8787;
+            color: white;
+        }
+
+        .cero {
+            grid-column: span 2;
+        }
+
+        .info {
+            margin-top: 15px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculadora">
+        <h1 class="titulo">🧮 Calculadora</h1>
+        
+        <div class="pantalla">
+            <div class="operacion" id="operacion"></div>
+            <div class="resultado" id="resultado">0</div>
+        </div>
+
+        <div class="botones">
+            <button class="limpiar" onclick="limpiar()">C</button>
+            <button class="funcion" onclick="agregarFuncion('sqrt')">√</button>
+            <button class="funcion" onclick="agregarFuncion('pow')">x²</button>
+            <button class="operador" onclick="agregar('/')">÷</button>
+
+            <button class="numero" onclick="agregar('7')">7</button>
+            <button class="numero" onclick="agregar('8')">8</button>
+            <button class="numero" onclick="agregar('9')">9</button>
+            <button class="operador" onclick="agregar('*')">×</button>
+
+            <button class="numero" onclick="agregar('4')">4</button>
+            <button class="numero" onclick="agregar('5')">5</button>
+            <button class="numero" onclick="agregar('6')">6</button>
+            <button class="operador" onclick="agregar('-')">-</button>
+
+            <button class="numero" onclick="agregar('1')">1</button>
+            <button class="numero" onclick="agregar('2')">2</button>
+            <button class="numero" onclick="agregar('3')">3</button>
+            <button class="operador" onclick="agregar('+')">+</button>
+
+            <button class="numero cero" onclick="agregar('0')">0</button>
+            <button class="numero" onclick="agregar('.')">.</button>
+            <button class="igual" onclick="calcular()">=</button>
+
+            <button class="funcion" onclick="agregarFuncion('percent')">%</button>
+            <button class="funcion" onclick="agregarFuncion('sin')">sin</button>
+            <button class="funcion" onclick="agregarFuncion('cos')">cos</button>
+            <button class="funcion" onclick="agregarFuncion('tan')">tan</button>
+        </div>
+
+        <div class="info">
+            Funciones: básicas, potencia, raíz, %, trigonometría
+        </div>
+    </div>
+
+    <script>
+        let operacionActual = '';
+        let resultadoActual = '0';
+        let operacionMostrar = '';
+
+        function actualizar() {
+            document.getElementById('resultado').textContent = resultadoActual;
+            document.getElementById('operacion').textContent = operacionMostrar;
+        }
+
+        function agregar(valor) {
+            if (resultadoActual === '0' && valor !== '.') {
+                resultadoActual = valor;
+            } else {
+                resultadoActual += valor;
+            }
+            operacionActual += valor;
+            operacionMostrar += valor;
+            actualizar();
+        }
+
+        function agregarFuncion(func) {
+            const num = parseFloat(resultadoActual);
+            let resultado;
+
+            switch(func) {
+                case 'sqrt':
+                    resultado = Math.sqrt(num);
+                    operacionMostrar = `√(${num})`;
+                    break;
+                case 'pow':
+                    resultado = Math.pow(num, 2);
+                    operacionMostrar = `${num}²`;
+                    break;
+                case 'percent':
+                    resultado = num / 100;
+                    operacionMostrar = `${num}%`;
+                    break;
+                case 'sin':
+                    resultado = Math.sin(num * Math.PI / 180);
+                    operacionMostrar = `sin(${num}°)`;
+                    break;
+                case 'cos':
+                    resultado = Math.cos(num * Math.PI / 180);
+                    operacionMostrar = `cos(${num}°)`;
+                    break;
+                case 'tan':
+                    resultado = Math.tan(num * Math.PI / 180);
+                    operacionMostrar = `tan(${num}°)`;
+                    break;
+            }
+
+            resultadoActual = resultado.toString();
+            operacionActual = resultado.toString();
+            actualizar();
+        }
+
+        function calcular() {
+            try {
+                const resultado = eval(operacionActual);
+                operacionMostrar += ' =';
+                resultadoActual = resultado.toString();
+                operacionActual = resultado.toString();
+                actualizar();
+            } catch (error) {
+                resultadoActual = 'Error';
+                actualizar();
+            }
+        }
+
+        function limpiar() {
+            operacionActual = '';
+            resultadoActual = '0';
+            operacionMostrar = '';
+            actualizar();
+        }
+
+        actualizar();
+    </script>
+</body>
+</html>
