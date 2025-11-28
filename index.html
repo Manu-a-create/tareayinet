@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Científica Avanzada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #71b5cf 0%, #c2a0e4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c6e6e;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background:  #2c6e6e;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .calculator {
+            display: grid;
+            gap: 15px;
+        }
+
+        .display {
+            background: #2d3748;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 2em;
+            text-align: right;
+            min-height: 80px;
+            word-wrap: break-word;
+            overflow-x: auto;
+        }
+
+        .history {
+            font-size: 0.5em;
+            color: #a0aec0;
+            margin-bottom: 5px;
+            min-height: 20px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f7fafc;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .operator {
+            background:  #2c6e6e;
+            color: white;
+        }
+
+        .operator:hover {
+            background:  #2c6e6e;
+        }
+
+        .equals {
+            background: #48bb78;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background: #38a169;
+        }
+
+        .clear {
+            background: #f56565;
+            color: white;
+        }
+
+        .clear:hover {
+            background: #e53e3e;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color:  #2c6e6e;
+        }
+
+        .result {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #2c6e6e;
+        }
+
+        .result strong {
+            color:  #2c6e6e;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        canvas {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            width: 100%;
+            height: 400px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #edf2f7;
+        }
+
+        .btn-action {
+            background: #2c6e6e;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background:  #2c6e6e;
+            transform: translateY(-2px);
+        }
+
+        .matrix-input {
+            display: grid;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .matrix-row {
+            display: flex;
+            gap: 5px;
+        }
+
+        .matrix-cell {
+            width: 60px;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculadora Científica Avanzada</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('basica')">Básica</button>
+            <button class="tab" onclick="showTab('cientifica')">Científica</button>
+            <button class="tab" onclick="showTab('conversiones')">Conversiones</button>
+            <button class="tab" onclick="showTab('ecuaciones')">Ecuaciones</button>
+            <button class="tab" onclick="showTab('matrices')">Matrices</button>
+            <button class="tab" onclick="showTab('estadistica')">Estadística</button>
+            <button class="tab" onclick="showTab('graficas')">Gráficas</button>
+            <button class="tab" onclick="showTab('financiera')">Financiera</button>
+        </div>
+
+        <!-- CALCULADORA BÁSICA -->
+        <div id="basica" class="tab-content active">
+            <div class="calculator">
+                <div class="display">
+                    <div class="history" id="history-display"></div>
+                    <div id="display">0</div>
+                </div>
+                <div class="buttons">
+                    <button class="clear" onclick="clearDisplay()">C</button>
+                    <button onclick="deleteLast()">⌫</button>
+                    <button onclick="appendToDisplay('(')">(</button>
+                    <button onclick="appendToDisplay(')')">)</button>
+                    <button class="operator" onclick="appendToDisplay('÷')">÷</button>
+                    
+                    <button onclick="appendToDisplay('7')">7</button>
+                    <button onclick="appendToDisplay('8')">8</button>
+                    <button onclick="appendToDisplay('9')">9</button>
+                    <button class="operator" onclick="appendToDisplay('x')">×</button>
+                    <button class="operator" onclick="appendToDisplay('x²')">x²</button>
+                    
+                    <button onclick="appendToDisplay('4')">4</button>
+                    <button onclick="appendToDisplay('5')">5</button>
+                    <button onclick="appendToDisplay('6')">6</button>
+                    <button class="operator" onclick="appendToDisplay('-')">−</button>
+                    <button class="operator" onclick="squareRoot()">√</button>
+                    
+                    <button onclick="appendToDisplay('1')">1</button>
+                    <button onclick="appendToDisplay('2')">2</button>
+                    <button onclick="appendToDisplay('3')">3</button>
+                    <button class="operator" onclick="appendToDisplay('+')">+</button>
+                    <button class="operator" onclick="appendToDisplay('%')">%</button>
+                    
+                    <button onclick="appendToDisplay('0')" style="grid-column: span 2;">0</button>
+                    <button onclick="appendToDisplay('.')">.</button>
+                    <button class="equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+            <div class="history-list" id="calc-history" style="margin-top: 20px;">
+                <strong>Historial:</strong>
+                <div id="history-items"></div>
+            </div>
+        </div>
+
+        <!-- CIENTÍFICA -->
+        <div id="cientifica" class="tab-content">
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Función Trigonométrica:</label>
+                    <select id="trig-func">
+                        <option value="sin">Seno (sin)</option>
+                        <option value="cos">Coseno (cos)</option>
+                        <option value="tan">Tangente (tan)</option>
+                        <option value="cot">cotangente (cot)</option>
+                        <option value="sec">secante (sec)</option>
+                        <option value="cose">cosecante (cose)</option>
+                    </select>
+                    <input type="number" id="trig-input" placeholder="Ingresa el ángulo">
+                    <button class="btn-action" onclick="calcTrig()">Calcular</button>
+                    <div class="result" id="trig-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Logaritmos:</label>
+                    <select id="log-type">
+                        <option value="log10">Log base 10</option>
+                        <option value="ln">Logaritmo natural (ln)</option>
+                        <option value="log2">Log base 2</option>
+                    </select>
+                    <input type="number" id="log-input" placeholder="Ingresa el número">
+                    <button class="btn-action" onclick="calcLog()">Calcular</button>
+                    <div class="result" id="log-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Potencias y Raíces:</label>
+                    <input type="number" id="power-base" placeholder="Base">
+                    <input type="number" id="power-exp" placeholder="Exponente">
+                    <button class="btn-action" onclick="calcPower()">Calcular Potencia</button>
+                    <button class="btn-action" onclick="calcRoot()">Calcular Raíz</button>
+                    <div class="result" id="power-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Factorial:</label>
+                    <input type="number" id="factorial-input" placeholder="Ingresa un número entero">
+                    <button class="btn-action" onclick="calcFactorial()">Calcular n!</button>
+                    <div class="result" id="factorial-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONVERSIONES -->
+        <div id="conversiones" class="tab-content">
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Convertir Temperatura:</label>
+                    <input type="number" id="temp-input" placeholder="Valor">
+                    <select id="temp-from">
+                        <option value="celsius">Celsius</option>
+                        <option value="fahrenheit">Fahrenheit</option>
+                        <option value="kelvin">Kelvin</option>
+                    </select>
+                    <select id="temp-to">
+                        <option value="fahrenheit">Fahrenheit</option>
+                        <option value="celsius">Celsius</option>
+                        <option value="kelvin">Kelvin</option>
+                    </select>
+                    <button class="btn-action" onclick="convertTemp()">Convertir</button>
+                    <div class="result" id="temp-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Convertir Longitud:</label>
+                    <input type="number" id="length-input" placeholder="Valor">
+                    <select id="length-from">
+                        <option value="m">Metros</option>
+                        <option value="km">Kilómetros</option>
+                        <option value="cm">Centímetros</option>
+                        <option value="mm">Milímetros</option>
+                        <option value="mi">Millas</option>
+                        <option value="ft">Pies</option>
+                        <option value="in">Pulgadas</option>
+                    </select>
+                    <select id="length-to">
+                        <option value="km">Kilómetros</option>
+                        <option value="m">Metros</option>
+                        <option value="cm">Centímetros</option>
+                        <option value="mm">Milímetros</option>
+                        <option value="mi">Millas</option>
+                        <option value="ft">Pies</option>
+                        <option value="in">Pulgadas</option>
+                    </select>
+                    <button class="btn-action" onclick="convertLength()">Convertir</button>
+                    <div class="result" id="length-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Convertir Bases Numéricas:</label>
+                    <input type="text" id="base-input" placeholder="Número">
+                    <select id="base-from">
+                        <option value="10">Decimal</option>
+                        <option value="2">Binario</option>
+                        <option value="8">Octal</option>
+                        <option value="16">Hexadecimal</option>
+                    </select>
+                    <select id="base-to">
+                        <option value="2">Binario</option>
+                        <option value="10">Decimal</option>
+                        <option value="8">Octal</option>
+                        <option value="16">Hexadecimal</option>
+                    </select>
+                    <button class="btn-action" onclick="convertBase()">Convertir</button>
+                    <div class="result" id="base-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Convertir Masa:</label>
+                    <input type="number" id="mass-input" placeholder="Valor">
+                    <select id="mass-from">
+                        <option value="kg">Kilogramos</option>
+                        <option value="g">Gramos</option>
+                        <option value="mg">Miligramos</option>
+                        <option value="lb">Libras</option>
+                        <option value="oz">Onzas</option>
+                    </select>
+                    <select id="mass-to">
+                        <option value="g">Gramos</option>
+                        <option value="kg">Kilogramos</option>
+                        <option value="mg">Miligramos</option>
+                        <option value="lb">Libras</option>
+                        <option value="oz">Onzas</option>
+                    </select>
+                    <button class="btn-action" onclick="convertMass()">Convertir</button>
+                    <div class="result" id="mass-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ECUACIONES -->
+        <div id="ecuaciones" class="tab-content">
+            <div class="input-group">
+                <label>Ecuación Cuadrática: ax² + bx + c = 0</label>
+                <input type="number" id="eq-a" placeholder="Coeficiente a">
+                <input type="number" id="eq-b" placeholder="Coeficiente b">
+                <input type="number" id="eq-c" placeholder="Coeficiente c">
+                <button class="btn-action" onclick="solveQuadratic()">Resolver</button>
+                <div class="result" id="quad-result"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Sistema de Ecuaciones 2x2:</label>
+                <p>a₁x + b₁y = c₁</p>
+                <input type="number" id="sys-a1" placeholder="a₁">
+                <input type="number" id="sys-b1" placeholder="b₁">
+                <input type="number" id="sys-c1" placeholder="c₁">
+                <p>a₂x + b₂y = c₂</p>
+                <input type="number" id="sys-a2" placeholder="a₂">
+                <input type="number" id="sys-b2" placeholder="b₂">
+                <input type="number" id="sys-c2" placeholder="c₂">
+                <button class="btn-action" onclick="solveSystem()">Resolver Sistema</button>
+                <div class="result" id="system-result"></div>
+            </div>
+        </div>
+
+        <!-- MATRICES -->
+        <div id="matrices" class="tab-content">
+            <div class="input-group">
+                <label>Tamaño de Matriz:</label>
+                <input type="number" id="matrix-rows" placeholder="Filas" value="3" min="2" max="4">
+                <input type="number" id="matrix-cols" placeholder="Columnas" value="3" min="2" max="4">
+                <button class="btn-action" onclick="createMatrixInputs()">Crear Matriz</button>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <label>Matriz A:</label>
+                    <div class="matrix-input" id="matrix-a"></div>
+                </div>
+                <div>
+                    <label>Matriz B:</label>
+                    <div class="matrix-input" id="matrix-b"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-action" onclick="addMatrices()">Sumar A + B</button>
+                <button class="btn-action" onclick="multiplyMatrices()">Multiplicar A × B</button>
+                <button class="btn-action" onclick="transposeMatrix()">Transponer A</button>
+                <button class="btn-action" onclick="determinantMatrix()">Determinante A</button>
+            </div>
+
+            <div class="result" id="matrix-result"></div>
+        </div>
+
+        <!-- ESTADÍSTICA -->
+        <div id="estadistica" class="tab-content">
+            <div class="input-group">
+                <label>Datos (separados por comas):</label>
+                <textarea id="stats-data" placeholder="Ej: 5, 8, 12, 15, 20, 25" rows="3"></textarea>
+                <button class="btn-action" onclick="calculateStats()">Calcular Estadísticas</button>
+                <div class="result" id="stats-result"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Combinatoria:</label>
+                <input type="number" id="comb-n" placeholder="n (total)">
+                <input type="number" id="comb-r" placeholder="r (selección)">
+                <button class="btn-action" onclick="calcCombinations()">Combinaciones C(n,r)</button>
+                <button class="btn-action" onclick="calcPermutations()">Permutaciones P(n,r)</button>
+                <div class="result" id="comb-result"></div>
+            </div>
+        </div>
+
+        <!-- GRÁFICAS -->
+        <div id="graficas" class="tab-content">
+            <div class="input-group">
+                <label>Función a graficar (usar x como variable):</label>
+                <input type="text" id="func-input" placeholder="Ej: x**2, Math.sin(x), 2*x+3">
+                <label>Rango de X:</label>
+                <input type="number" id="x-min" placeholder="X mínimo" value="-10">
+                <input type="number" id="x-max" placeholder="X máximo" value="10">
+                <button class="btn-action" onclick="plotFunction()">Graficar</button>
+            </div>
+            <canvas id="graph-canvas"></canvas>
+        </div>
+
+        <!-- FINANCIERA -->
+        <div id="financiera" class="tab-content">
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Interés Compuesto:</label>
+                    <input type="number" id="fin-principal" placeholder="Capital inicial">
+                    <input type="number" id="fin-rate" placeholder="Tasa de interés (%)">
+                    <input type="number" id="fin-time" placeholder="Tiempo (años)">
+                    <input type="number" id="fin-freq" placeholder="Frecuencia anual" value="12">
+                    <button class="btn-action" onclick="calcCompoundInterest()">Calcular</button>
+                    <div class="result" id="compound-result"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Amortización de Préstamo:</label>
+                    <input type="number" id="loan-amount" placeholder="Monto del préstamo">
+                    <input type="number" id="loan-rate" placeholder="Tasa anual (%)">
+                    <input type="number" id="loan-months" placeholder="Meses">
+                    <button class="btn-action" onclick="calcLoanPayment()">Calcular Pago</button>
+                    <div class="result" id="loan-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let historyText = '';
+        let calcHistory = [];
+
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // CALCULADORA BÁSICA
+        function appendToDisplay(value) {
+            if (currentInput === '0') {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = currentInput;
+            document.getElementById('history-display').textContent = historyText;
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            historyText = '';
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            currentInput = currentInput.slice(0, -1) || '0';
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                const result = eval(currentInput);
+                historyText = currentInput + ' =';
+                currentInput = result.toString();
+                updateDisplay();
+                
+                calcHistory.push({expression: historyText, result: currentInput});
+                updateHistory();
+            } catch (error) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function squareRoot() {
+            try {
+                const result = Math.sqrt(eval(currentInput));
+                historyText = '√(' + currentInput + ') =';
+                currentInput = result.toString();
+                updateDisplay();
+            } catch (error) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function updateHistory() {
+            const historyItems = document.getElementById('history-items');
+            historyItems.innerHTML = calcHistory.slice(-10).reverse().map(item => 
+                `<div class="history-item" onclick="currentInput='${item.result}'; updateDisplay();">
+                    ${item.expression} ${item.result}
+                </div>`
+            ).join('');
+        }
+
+        // FUNCIONES CIENTÍFICAS
+        function calcTrig() {
+            const func = document.getElementById('trig-func').value;
+            const angle = parseFloat(document.getElementById('trig-input').value);
+            const radians = angle * Math.PI / 180;
+            let result;
+
+            switch(func) {
+                case 'sin': result = Math.sin(radians); break;
+                case 'cos': result = Math.cos(radians); break;
+                case 'tan': result = Math.tan(radians); break;
+                case 'asin': result = Math.asin(angle) * 180 / Math.PI; break;
+                case 'acos': result = Math.acos(angle) * 180 / Math.PI; break;
+                case 'atan': result = Math.atan(angle) * 180 / Math.PI; break;
+            }
+
+            document.getElementById('trig-result').innerHTML = 
+                `<strong>Resultado:</strong> ${result.toFixed(6)}`;
+        }
+
+        function calcLog() {
+            const type = document.getElementById('log-type').value;
+            const num = parseFloat(document.getElementById('log-input').value);
+            let result;
+
+            switch(type) {
+                case 'log10': result = Math.log10(num); break;
+                case 'ln': result = Math.log(num); break;
+                case 'log2': result = Math.log2(num); break;
+            }
+
+            document.getElementById('log-result').innerHTML = 
+                `<strong>Resultado:</strong> ${result.toFixed(6)}`;
+        }
+
+        function calcPower() {
+            const base = parseFloat(document.getElementById('power-base').value);
+            const exp = parseFloat(document.getElementById('power-exp').value);
+            const result = Math.pow(base, exp);
+            
+            document.getElementById('power-result').innerHTML = 
+                `<strong>${base}^${exp} =</strong> ${result}`;
+        }
+
+        function calcRoot() {
+            const base = parseFloat(document.getElementById('power-base').value);
+            const exp = parseFloat(document.getElementById('power-exp').value);
+            const result = Math.pow(base, 1/exp);
+            
+            document.getElementById('power-result').innerHTML = 
+                `<strong>Raíz ${exp} de ${base} =</strong> ${result.toFixed(6)}`;
+        }
+
+        function calcFactorial() {
+            const n = parseInt(document.getElementById('factorial-input').value);
+            if (n < 0 || n > 170) {
+                document.getElementById('factorial-result').innerHTML = 
+                    '<strong>Error:</strong> Ingresa un número entre 0 y 170';
+                return;
+            }
+            
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            
+            document.getElementById('factorial-result').innerHTML = 
+                `<strong>${n}! =</strong> ${result}`;
+        }
+
+        // CONVERSIONES
+        function convertTemp() {
+            const value = parseFloat(document.getElementById('temp-input').value);
+            const from = document.getElementById('temp-from').value;
+            const to = document.getElementById('temp-to').value;
+            
+            let celsius;
+            if (from === 'celsius') celsius = value;
+            else if (from === 'fahrenheit') celsius = (value - 32) * 5/9;
+            else celsius = value - 273.15;
+            
+            let result;
+            if (to === 'celsius') result = celsius;
+            else if (to === 'fahrenheit') result = celsius * 9/5 + 32;
+            else result = celsius + 273.15;
+            
+            document.getElementById('temp-result').innerHTML = 
+                `<strong>Resultado:</strong> ${result.toFixed(2)} ${to}`;
+        }
+
+        function convertLength() {
+            const value = parseFloat(document.getElementById('length-input').value);
+            const from = document.getElementById('length-from').value;
+            const to = document.getElementById('length-to').value;
+            
+            const toMeters = {
+                m: 1, km: 1000, cm: 0.01, mm: 0.001,
+                mi: 1609.34, ft: 0.3048, in: 0.0254
+            };
+            
+            const meters = value * toMeters[from];
+            const result = meters / toMeters[to];
+            
+            document.getElementById('length-result').innerHTML = 
+                `<strong>Resultado:</strong> ${result.toFixed(6)} ${to}`;
+        }
+
+        function convertBase() {
+            const value = document.getElementById('base-input').value;
+            const from = parseInt(document.getElementById('base-from').value);
+            const to = parseInt(document.getElementById('base-to').value);
+            
+            try {
+                const decimal = parseInt(value, from);
+                const result = decimal.toString(to).toUpperCase();
+                
+                document.getElementById('base-result').innerHTML = 
+                    `<strong>Resultado:</strong> ${result}`;
+            } catch (error) {
+                document.getElementById('base-result').innerHTML = 
+                    '<strong>Error:</strong> Valor inválido';
+            }
+        }
+
+        function convertMass() {
+            const value = parseFloat(document.getElementById('mass-input').value);
+            const from = document.getElementById('mass-from').value;
+            const to = document.getElementById('mass-to').value;
+            
+            const toKg = {
+                kg: 1, g: 0.001, mg: 0.000001,
+                lb: 0.453592, oz: 0.0283495
+            };
+            
+            const kg = value * toKg[from];
+            const result = kg / toKg[to];
+            
+            document.getElementById('mass-result').innerHTML = 
+                `<strong>Resultado:</strong> ${result.toFixed(6)} ${to}`;
+        }
+
+        // ECUACIONES
+        function solveQuadratic() {
+            const a = parseFloat(document.getElementById('eq-a').value);
+            const b = parseFloat(document.getElementById('eq-b').value);
+            const c = parseFloat(document.getElementById('eq-c').value);
+            
+            const discriminant = b*b - 4*a*c;
+            
+            if (discriminant > 0) {
+                const x1 = (-b + Math.sqrt(discriminant)) / (2*a);
+                const x2 = (-b - Math.sqrt(discriminant)) / (2*a);
+                document.getElementById('quad-result').innerHTML = 
+                    `<strong>Dos soluciones reales:</strong><br>
+                    x₁ = ${x1.toFixed(4)}<br>
+                    x₂ = ${x2.toFixed(4)}`;
+            } else if (discriminant === 0) {
+                const x = -b / (2*a);
+                document.getElementById('quad-result').innerHTML = 
+                    `<strong>Una solución doble:</strong><br>x = ${x.toFixed(4)}`;
+            } else {
+                const realPart = (-b / (2*a)).toFixed(4);
+                const imagPart = (Math.sqrt(-discriminant) / (2*a)).toFixed(4);
+                document.getElementById('quad-result').innerHTML = 
+                    `<strong>Dos soluciones complejas:</strong><br>
+                    x₁ = ${realPart} + ${imagPart}i<br>
+                    x₂ = ${realPart} - ${imagPart}i`;
+            }
+        }
+
+        function solveSystem() {
+            const a1 = parseFloat(document.getElementById('sys-a1').value);
+            const b1 = parseFloat(document.getElementById('sys-b1').value);
+            const c1 = parseFloat(document.getElementById('sys-c1').value);
+            const a2 = parseFloat(document.getElementById('sys-a2').value);
+            const b2 = parseFloat(document.getElementById('sys-b2').value);
+            const c2 = parseFloat(document.getElementById('sys-c2').value);
+            
+            const det = a1*b2 - a2*b1;
+            
+            if (det === 0) {
+                document.getElementById('system-result').innerHTML = 
+                    '<strong>El sistema no tiene solución única</strong> (determinante = 0)';
+                return;
+            }
+            
+            const x = (c1*b2 - c2*b1) / det;
+            const y = (a1*c2 - a2*c1) / det;
+            
+            document.getElementById('system-result').innerHTML = 
+                `<strong>Solución:</strong><br>x = ${x.toFixed(4)}<br>y = ${y.toFixed(4)}`;
+        }
+
+        // MATRICES
+        let matrixA = [];
+        let matrixB = [];
+
+        function createMatrixInputs() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            
+            createMatrix('matrix-a', rows, cols);
+            createMatrix('matrix-b', rows, cols);
+        }
+
+        function createMatrix(id, rows, cols) {
+            const container = document.getElementById(id);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < rows; i++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'matrix-row';
+                
+                for (let j = 0; j < cols; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'matrix-cell';
+                    input.value = '0';
+                    input.dataset.row = i;
+                    input.dataset.col = j;
+                    input.dataset.matrix = id;
+                    rowDiv.appendChild(input);
+                }
+                
+                container.appendChild(rowDiv);
+            }
+        }
+
+        function getMatrix(id) {
+            const inputs = document.querySelectorAll(`#${id} input`);
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            const matrix = [];
+            
+            for (let i = 0; i < rows; i++) {
+                matrix[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    const input = document.querySelector(`#${id} input[data-row="${i}"][data-col="${j}"]`);
+                    matrix[i][j] = parseFloat(input.value) || 0;
+                }
+            }
+            
+            return matrix;
+        }
+
+        function addMatrices() {
+            const a = getMatrix('matrix-a');
+            const b = getMatrix('matrix-b');
+            const result = [];
+            
+            for (let i = 0; i < a.length; i++) {
+                result[i] = [];
+                for (let j = 0; j < a[i].length; j++) {
+                    result[i][j] = a[i][j] + b[i][j];
+                }
+            }
+            
+            displayMatrixResult(result);
+        }
+
+        function multiplyMatrices() {
+            const a = getMatrix('matrix-a');
+            const b = getMatrix('matrix-b');
+            
+            if (a[0].length !== b.length) {
+                document.getElementById('matrix-result').innerHTML = 
+                    '<strong>Error:</strong> Las dimensiones no son compatibles para multiplicación';
+                return;
+            }
+            
+            const result = [];
+            for (let i = 0; i < a.length; i++) {
+                result[i] = [];
+                for (let j = 0; j < b[0].length; j++) {
+                    result[i][j] = 0;
+                    for (let k = 0; k < b.length; k++) {
+                        result[i][j] += a[i][k] * b[k][j];
+                    }
+                }
+            }
+            
+            displayMatrixResult(result);
+        }
+
+        function transposeMatrix() {
+            const a = getMatrix('matrix-a');
+            const result = [];
+            
+            for (let j = 0; j < a[0].length; j++) {
+                result[j] = [];
+                for (let i = 0; i < a.length; i++) {
+                    result[j][i] = a[i][j];
+                }
+            }
+            
+            displayMatrixResult(result);
+        }
+
+        function determinantMatrix() {
+            const a = getMatrix('matrix-a');
+            
+            if (a.length !== a[0].length) {
+                document.getElementById('matrix-result').innerHTML = 
+                    '<strong>Error:</strong> La matriz debe ser cuadrada';
+                return;
+            }
+            
+            const det = calculateDeterminant(a);
+            document.getElementById('matrix-result').innerHTML = 
+                `<strong>Determinante:</strong> ${det.toFixed(4)}`;
+        }
+
+        function calculateDeterminant(matrix) {
+            const n = matrix.length;
+            
+            if (n === 1) return matrix[0][0];
+            if (n === 2) return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0];
+            
+            let det = 0;
+            for (let j = 0; j < n; j++) {
+                det += Math.pow(-1, j) * matrix[0][j] * calculateDeterminant(getMinor(matrix, 0, j));
+            }
+            return det;
+        }
+
+        function getMinor(matrix, row, col) {
+            return matrix
+                .filter((_, i) => i !== row)
+                .map(r => r.filter((_, j) => j !== col));
+        }
+
+        function displayMatrixResult(matrix) {
+            let html = '<strong>Resultado:</strong><br><table style="margin: 10px auto;">';
+            for (let i = 0; i < matrix.length; i++) {
+                html += '<tr>';
+                for (let j = 0; j < matrix[i].length; j++) {
+                    html += `<td style="padding: 5px; text-align: center;">${matrix[i][j].toFixed(2)}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table>';
+            document.getElementById('matrix-result').innerHTML = html;
+        }
+
+        // ESTADÍSTICA
+        function calculateStats() {
+            const input = document.getElementById('stats-data').value;
+            const data = input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+            
+            if (data.length === 0) {
+                document.getElementById('stats-result').innerHTML = 
+                    '<strong>Error:</strong> Ingresa datos válidos';
+                return;
+            }
+            
+            data.sort((a, b) => a - b);
+            
+            const n = data.length;
+            const sum = data.reduce((a, b) => a + b, 0);
+            const mean = sum / n;
+            
+            const variance = data.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance);
+            
+            const median = n % 2 === 0 
+                ? (data[n/2 - 1] + data[n/2]) / 2 
+                : data[Math.floor(n/2)];
+            
+            const min = data[0];
+            const max = data[n - 1];
+            
+            const freq = {};
+            data.forEach(x => freq[x] = (freq[x] || 0) + 1);
+            const mode = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+            
+            document.getElementById('stats-result').innerHTML = `
+                <strong>Estadísticas:</strong><br>
+                Media: ${mean.toFixed(4)}<br>
+                Mediana: ${median.toFixed(4)}<br>
+                Moda: ${mode}<br>
+                Desviación Estándar: ${stdDev.toFixed(4)}<br>
+                Varianza: ${variance.toFixed(4)}<br>
+                Mínimo: ${min}<br>
+                Máximo: ${max}<br>
+                Rango: ${(max - min).toFixed(4)}<br>
+                Cantidad de datos: ${n}
+            `;
+        }
+
+        function calcCombinations() {
+            const n = parseInt(document.getElementById('comb-n').value);
+            const r = parseInt(document.getElementById('comb-r').value);
+            
+            if (r > n || r < 0 || n < 0) {
+                document.getElementById('comb-result').innerHTML = 
+                    '<strong>Error:</strong> Valores inválidos';
+                return;
+            }
+            
+            const result = factorial(n) / (factorial(r) * factorial(n - r));
+            document.getElementById('comb-result').innerHTML = 
+                `<strong>C(${n},${r}) =</strong> ${result}`;
+        }
+
+        function calcPermutations() {
+            const n = parseInt(document.getElementById('comb-n').value);
+            const r = parseInt(document.getElementById('comb-r').value);
+            
+            if (r > n || r < 0 || n < 0) {
+                document.getElementById('comb-result').innerHTML = 
+                    '<strong>Error:</strong> Valores inválidos';
+                return;
+            }
+            
+            const result = factorial(n) / factorial(n - r);
+            document.getElementById('comb-result').innerHTML = 
+                `<strong>P(${n},${r}) =</strong> ${result}`;
+        }
+
+        function factorial(n) {
+            if (n <= 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+
+        // GRÁFICAS
+        function plotFunction() {
+            const funcStr = document.getElementById('func-input').value;
+            const xMin = parseFloat(document.getElementById('x-min').value);
+            const xMax = parseFloat(document.getElementById('x-max').value);
+            
+            const canvas = document.getElementById('graph-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Calcular puntos
+            const points = [];
+            const step = (xMax - xMin) / 500;
+            let yMin = Infinity, yMax = -Infinity;
+            
+            for (let x = xMin; x <= xMax; x += step) {
+                try {
+                    const y = eval(funcStr);
+                    if (isFinite(y)) {
+                        points.push({x, y});
+                        yMin = Math.min(yMin, y);
+                        yMax = Math.max(yMax, y);
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            if (points.length === 0) {
+                ctx.fillText('Error: Función inválida', canvas.width/2, canvas.height/2);
+                return;
+            }
+            
+            // Escalar
+            const padding = 40;
+            const scaleX = (canvas.width - 2*padding) / (xMax - xMin);
+            const scaleY = (canvas.height - 2*padding) / (yMax - yMin);
+            
+            // Dibujar ejes
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            
+            const originX = padding + (-xMin) * scaleX;
+            const originY = canvas.height - padding - (-yMin) * scaleY;
+            
+            ctx.beginPath();
+            ctx.moveTo(padding, originY);
+            ctx.lineTo(canvas.width - padding, originY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(originX, padding);
+            ctx.lineTo(originX, canvas.height - padding);
+            ctx.stroke();
+            
+            // Dibujar función
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            points.forEach((point, i) => {
+                const px = padding + (point.x - xMin) * scaleX;
+                const py = canvas.height - padding - (point.y - yMin) * scaleY;
+                
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            });
+            
+            ctx.stroke();
+            
+            // Etiquetas
+            ctx.fillStyle = '#000';
+            ctx.font = '12px sans-serif';
+            ctx.fillText(`x: [${xMin}, ${xMax}]`, 10, 20);
+            ctx.fillText(`y: [${yMin.toFixed(2)}, ${yMax.toFixed(2)}]`, 10, 35);
+        }
+
+        // FINANCIERA
+        function calcCompoundInterest() {
+            const P = parseFloat(document.getElementById('fin-principal').value);
+            const r = parseFloat(document.getElementById('fin-rate').value) / 100;
+            const t = parseFloat(document.getElementById('fin-time').value);
+            const n = parseFloat(document.getElementById('fin-freq').value);
+            
+            const A = P * Math.pow(1 + r/n, n*t);
+            const interest = A - P;
+            
+            document.getElementById('compound-result').innerHTML = `
+                <strong>Resultados:</strong><br>
+                Monto Final: ${A.toFixed(2)}<br>
+                Intereses Ganados: ${interest.toFixed(2)}<br>
+                Capital Inicial: ${P.toFixed(2)}
+            `;
+        }
+
+        function calcLoanPayment() {
+            const P = parseFloat(document.getElementById('loan-amount').value);
+            const r = parseFloat(document.getElementById('loan-rate').value) / 100 / 12;
+            const n = parseFloat(document.getElementById('loan-months').value);
+            
+            const M = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            const totalPaid = M * n;
+            const totalInterest = totalPaid - P;
+            
+            document.getElementById('loan-result').innerHTML = `
+                <strong>Resultados:</strong><br>
+                Pago Mensual: ${M.toFixed(2)}<br>
+                Total a Pagar: ${totalPaid.toFixed(2)}<br>
+                Total en Intereses: ${totalInterest.toFixed(2)}
+            `;
+        }
+
+        // Inicializar
+        createMatrixInputs();
+    </script>
+</body>
+</html>
